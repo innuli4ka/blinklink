@@ -25,7 +25,7 @@ graph TD
     D --> F[Generate short ID]
     F --> G[Return short URL]
     G --> B
-    B --> A[Show shortened URL to user]
+    B --> A[User]
 
 ```
 
