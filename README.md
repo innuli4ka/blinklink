@@ -17,23 +17,24 @@ Step-by-step guide to setting up a BlinkLinlk - URL shortening service using AWS
 ## 🏗️ Architecture Overview
 
 ```mermaid
-graph TD;
-    A[User] --> B[S3 Static Website];
-    B --> C[Lambda Function URL - POST /shorten];
-    C --> D[Lambda Function];
-    D --> E[DynamoDB - Save URL];
-    D --> F[Generate short ID];
-    F --> G[Return short URL];
-    G --> B;
-    B --> H[Show shortened URL to user];
+graph TD
+    A[User] --> B[S3 Static Website]
+    B --> C[Lambda Function URL - POST /shorten]
+    C --> D[Lambda Function]
+    D --> E[DynamoDB - Save URL]
+    D --> F[Generate short ID]
+    F --> G[Return short URL]
+    G --> B
+    B --> H[Show shortened URL to user]
 
     subgraph Redirection
-        R1[User opens short URL] --> R2[Lambda Function URL - GET /{id}];
-        R2 --> R3[Lambda Function];
-        R3 --> R4[DynamoDB - Fetch original URL];
-        R4 --> R5[Return redirect response];
+        R1[User opens short URL] --> R2[Lambda Function URL - GET /&#123;id&#125;]
+        R2 --> R3[Lambda Function]
+        R3 --> R4[DynamoDB - Fetch original URL]
+        R4 --> R5[Return redirect response]
     end
 ```
+
 
 ---
 
