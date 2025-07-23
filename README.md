@@ -16,7 +16,7 @@ Step-by-step guide to setting up a BlinkLinlk - URL shortening service using AWS
 
 ## 🏗️ Architecture Overview
 
-```
+```mermaid
 graph TD
     A[User] --> B[S3 Static Website]
     B --> C[Lambda Function URL - POST /shorten]
