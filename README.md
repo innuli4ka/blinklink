@@ -1,4 +1,4 @@
-# 🚀 BLINKLINK URL Shortener Project - Setup Tutorial
+<img width="1567" height="494" alt="image" src="https://github.com/user-attachments/assets/5399ff49-53da-435e-8390-c01759c56329" /># 🚀 BLINKLINK URL Shortener Project - Setup Tutorial
 
 Step-by-step guide to setting up a BlinkLinlk - URL shortening service using AWS Lambda, Lambda Function URL DynamoDB, and S3 we  .
 
@@ -40,16 +40,23 @@ graph TD
 1. Log into AWS Console
 2. Search for "DynamoDB"
 3. Click on "DynamoDB"
+<img width="1002" height="429" alt="image" src="https://github.com/user-attachments/assets/9637bd59-b019-4834-837e-c1b5244754ba" />
 
 ### 1.2 Create Table
 
 1. Click **"Create table"**
-2. Enter:
+   <img width="1567" height="494" alt="image" src="https://github.com/user-attachments/assets/1cdaf2e1-af99-4f11-b25f-ce2ee816b160" />
+
+3. Enter:
 
    * **Table name**: `ShortUrls`
    * **Partition key**: `id` (String)
-3. Leave defaults as is
-4. Click **"Create table"**
+     <img width="1169" height="590" alt="image" src="https://github.com/user-attachments/assets/0963a9da-23ea-4a31-8415-13bfd13c3b49" />
+
+4. Leave defaults as is
+5. Click **"Create table"**
+<img width="1840" height="424" alt="image" src="https://github.com/user-attachments/assets/5016d31f-e047-47ca-aaaf-26ab529e6be3" />
+
 
 ### 1.3 Wait for Table to Be Active
 
@@ -63,20 +70,23 @@ graph TD
 
 1. Search for "Lambda"
 2. Click on "Lambda"
+<img width="1005" height="428" alt="image" src="https://github.com/user-attachments/assets/5064da19-a8b4-46a3-9f4e-2b6b5c46d102" />
 
 ### 2.2 Create a New Function
 
 1. Click **"Create function"**
-2. Choose **"Author from scratch"**
-3. Enter:
+   <img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/c7586e8e-42a5-47c1-94ec-84c8389b397b" />
 
+3. Choose **"Author from scratch"**
+4. Enter:
    * **Function name**: `url-shortener`
-   * **Runtime**: `Python 3.11`
-   * **Architecture**: `x86_64`
+   * **Runtime**: `Python 3.12`
+   * **Architecture**: `arm64`
+<img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/8917394e-bffa-4bed-933c-48e5e7b80202" />
 
 ### 2.3 Set Permissions
 
-1. Under **"Change default execution role"**, select **"Create a new role with basic Lambda permissions"**
+1. Under **"Change default execution role"**, select **"Use an existing role"**. From the dropdown option choose `LabRole`
 2. Click **"Create function"**
 
 ### 2.4 Add DynamoDB Permissions
