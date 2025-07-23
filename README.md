@@ -1,4 +1,4 @@
-<img width="1567" height="494" alt="image" src="https://github.com/user-attachments/assets/5399ff49-53da-435e-8390-c01759c56329" /># 🚀 BLINKLINK URL Shortener Project - Setup Tutorial
+# 🚀 BLINKLINK URL Shortener Project - Setup Tutorial
 
 Step-by-step guide to setting up a BlinkLinlk - URL shortening service using AWS Lambda, Lambda Function URL DynamoDB, and S3 we  .
 
