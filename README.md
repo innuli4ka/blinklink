@@ -26,8 +26,16 @@ graph TD
     F --> G[Return short URL]
     G --> B
     B --> H[Show shortened URL to user]
+end
 ```
-
+```mermaid
+graph TD
+ R1[User opens short URL] --> R2[Lambda Function URL - GET /&#123;id&#125;]
+        R2 --> R3[Lambda Function]
+        R3 --> R4[DynamoDB - Fetch original URL]
+        R4 --> R5[Return redirect response]
+end
+```
 
 ---
 
