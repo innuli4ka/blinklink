@@ -89,14 +89,9 @@ graph TD
 1. Under **"Change default execution role"**, select **"Use an existing role"**. From the dropdown option choose `LabRole`
 2. Click **"Create function"**
 
-### 2.4 Add DynamoDB Permissions
+<img width="1169" height="523" alt="image" src="https://github.com/user-attachments/assets/50a87dcc-99d9-45e0-a078-585752cfc686" />
 
-1. Open the function page
-2. Go to **"Configuration"** → **"Permissions"**
-3. Click on the role name (e.g. `url-shortener-role-xxxxx`)
-4. In IAM, click **"Add permissions"** → **"Attach policies"**
-5. Search for `AmazonDynamoDBFullAccess`
-6. Check it and click **"Add permissions"**
+
 
 ---
 
@@ -139,8 +134,13 @@ Place all Python files in the correct folders.
 
 1. Go to your Lambda function
 2. In **"Code"** tab, click **"Upload from"** → **".zip file"**
-3. Select your ZIP file
-4. Click **"Save"**
+
+   <img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/8e804f95-538e-42b4-9d17-b710f52a002d" />
+
+4. Select your ZIP file
+5. Click **"Save"**
+   
+<img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/4bf81e55-8d18-43cd-ac20-d9a709c72c53" />
 
 ---
 
@@ -150,10 +150,15 @@ Place all Python files in the correct folders.
 
 1. In your Lambda function page, click **"Configuration"** → **"Function URL"**
 2. Click **"Create function URL"**
+
+![Uploading image.png…]()
+
 3. Choose:
 
    * **Auth type**: `NONE` (for public access)
 4. Click **"Save"**
+
+![Uploading image.png…]()
 
 ### 4.2 Get Your Function URL
 
