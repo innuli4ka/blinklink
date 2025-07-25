@@ -1,2 +1,22 @@
-# Ignore Python virtual environment
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+
+# Local virtual env
 venv/
+
+# VSCode and IDE folders
+.vscode/
+.idea/
+
+# Terraform state and plan files
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfplan
+
+# Sensitive config values
+terraform/terraform.tfvars
+
+# Lambda deployment zip
+url-shortener-lambda.zip
