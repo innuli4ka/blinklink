@@ -1,12 +1,21 @@
 import json
 
+def _get_cors_headers():
+    """מחזיר headers של CORS"""
+    return {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
+    }
+
 def create_error_response(status_code, error_message):
 
     # יוצר תגובת שגיאה סטנדרטית
 
     return {
         'statusCode': status_code,
-        'headers': {"Content-Type": "application/json"},
+        'headers': _get_cors_headers(),
         'body': json.dumps({"error": error_message})
     }
 
@@ -16,7 +25,7 @@ def create_success_response(data):
 
     return {
         'statusCode': 200,
-        'headers': {"Content-Type": "application/json"},
+        'headers': _get_cors_headers(),
         'body': json.dumps(data)
     }
 
@@ -28,7 +37,10 @@ def create_redirect_response(url):
         'statusCode': 302,
         'headers': {
             'Location': url,
-            'Content-Type': 'text/html'
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin': "*",
+            'Access-Control-Allow-Headers': "Content-Type",
+            'Access-Control-Allow-Methods': "GET, POST, OPTIONS"
         },
         'body': _create_redirect_html(url)
     }

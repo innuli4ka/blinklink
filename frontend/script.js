@@ -65,8 +65,12 @@ document.addEventListener("DOMContentLoaded", () => {
     result.classList.remove('has-content');
 
     try {
+      console.log("Sending POST request to Lambda...");
+      console.log("URL:", "https://ruzwaoxcbiufiuukrlfrczlt4i0dwpsv.lambda-url.us-west-2.on.aws/");
+      console.log("Body:", { url: longUrl });
+      
       // Send the URL to the Lambda function using a POST request
-      const response = await fetch("https://7w6n32f4pbuzoz2w4bnb7ij5vq0vjxko.lambda-url.us-west-2.on.aws/shorten", {
+      const response = await fetch("https://ruzwaoxcbiufiuukrlfrczlt4i0dwpsv.lambda-url.us-west-2.on.aws/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json", // Tell the server we're sending JSON
@@ -74,12 +78,19 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify({ url: longUrl }), // Convert the data to JSON
       });
 
+      console.log("Response received:", response);
+      console.log("Response status:", response.status);
+      console.log("Response headers:", response.headers);
+
       // Convert the server's reply into a JavaScript object
       const data = await response.json();
+      console.log("Response data:", data);
+      console.log("Response data type:", typeof data);
+      console.log("Response data keys:", Object.keys(data));
 
       // If the request worked, show the short URL
       if (response.ok) {
-        const shortUrl = `https://7w6n32f4pbuzoz2w4bnb7ij5vq0vjxko.lambda-url.us-west-2.on.aws/${data.short_id}`;
+        const shortUrl = `https://ruzwaoxcbiufiuukrlfrczlt4i0dwpsv.lambda-url.us-west-2.on.aws/${data.short_id}`;
         
         // יצירת כפתור העתקה
         const copyButton = document.createElement('button');
