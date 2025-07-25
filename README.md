@@ -151,14 +151,16 @@ Place all Python files in the correct folders.
 1. In your Lambda function page, click **"Configuration"** → **"Function URL"**
 2. Click **"Create function URL"**
 
-![Uploading image.png…]()
+<img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/c5bf5dd3-ca86-4acd-a98f-5b7702f4ec25" />
+
 
 3. Choose:
 
    * **Auth type**: `NONE` (for public access)
 4. Click **"Save"**
 
-![Uploading image.png…]()
+<img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/1d42833b-08d2-4b97-88eb-3c7772fa9fdd" />
+
 
 ### 4.2 Get Your Function URL
 
@@ -170,78 +172,90 @@ https://xxxxxx.lambda-url.region.on.aws/
 
 This URL will be used for both POST and GET requests.
 
-> ⚠️ You may need to add logic in your code to distinguish between `POST /shorten` and `GET /{id}` requests.
+<img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/4f4ff25b-03d1-40e5-9f99-3efa7d7c6f33" />
+
 
 ---
 
-## 🧪 Step 5: Test It!
+## 📂 Step 5: Create and Configure S3 Static Website
 
-### 5.1 Create a Link
+### 5.1 Create an S3 Bucket
 
-```bash
-curl -X POST https://your-function-url/ \
-  -H "Content-Type: application/json" \
-  -d '{"url": "https://www.google.com"}'
-```
+1. Go to the AWS Console and search for "S3"
+<img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/b79eab39-cb20-422b-9857-b0987393955b" />
 
-Expected response:
+2. Click "Create bucket"
 
-```json
-{"short_id": "abc123"}
-```
+<img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/53f9f151-03c5-44a4-9467-4e7a7aec7f33" />
 
-### 5.2 Test Redirection
+3. Choose bucket type `General purpose`
+4. Enter a unique Bucket name, e.g., `blinklink-frontend`
+5. Under Object Ownership - choose `ACLs disabled (recommended)`
+<img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/44bc3d4d-52a7-4769-a253-850d7fa5f688" />
+6.  Uncheck "Block all public access" (you will be prompted to acknowledge this change)
+7.  Click "Create bucket"
 
-```bash
-curl -L https://your-function-url/abc123
-```
+<img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/2fd3a630-1f07-4836-88e7-ab92e32297e5" />
 
-### 5.3 Browser Test
+### 5.2 Upload Website Files
 
-Open in browser: `https://your-function-url/abc123`
+1. Prepare your HTML/JS/CSS files locally
+2. Click on your bucket name
 
----
+<img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/a8eb6535-b474-4fef-8e83-d91a43a9d0a1" />
 
-## 📊 Step 6: Logs & Monitoring
+3. Click "Upload" → Drag and drop or choose your files or folder → Click "Upload"
+<img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/3471695b-1d8c-4fc5-bdfa-ef671603cfee" />
 
-### 6.1 View Logs in CloudWatch
+<img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/e7c70323-3129-4436-9a70-d703c3f3015a" />
 
-1. Open Lambda function
-2. Go to **"Monitor"** tab → **"View logs in CloudWatch"**
+### 5.3 Enable Static Website Hosting
 
-### 6.2 View Table Items
+1. Inside your bucket, go to the "Properties" tab
 
-1. Go to DynamoDB Console → `ShortUrls` table
-2. Click **"Explore table items"**
+<img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/b268e36f-b8e5-4f7d-8cb8-607f38f6a77a" />
 
----
+2. Scroll to "Static website hosting" and click "Edit"
 
-## 🔧 Step 7: Advanced Settings (Optional)
+<img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/e3d8d695-9bf5-48e5-9bda-5218a7d681fb" />
 
-### 7.1 Custom Domain Name (via CloudFront + Route 53)
+3. Select "Enable"
+4. Under Index document: index.html (this is the html file that you updated earlier)
+5. (Optional) Error document: error.html
+6. Click "Save changes"
 
-1. Set up a custom domain using Amazon CloudFront
-2. Attach your Lambda Function URL as the origin
-3. Configure Route 53 to point your domain to the CloudFront distribution
+<img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/b6786bf3-019c-47bb-b162-1fa2de3bf5ba" />
 
-### 7.2 Add Expiry Logic or Analytics
+Scroll to the bottom of the page - you will see a static website endpoint URL. This is your frontend's public URL.
+Copy it, we will use it later:
 
-1. Modify your Lambda code to handle link expiration
-2. Track click counts and log to CloudWatch or another service
+<img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/9f691639-f2d7-40bb-bd29-2b034c827e9c" />
 
----
 
-## 💰 Expected Costs (us-east-1)
+### 5.4 Set Permissions for Public Access
 
-* **Lambda**: \~\$0.20 per million requests + runtime
-* **DynamoDB**: \~\$0.25 per million reads/writes
-* **Function URL**: Free (part of Lambda)
+1. Go to the "Permissions" tab of your bucket
+2. Scroll to "Bucket policy" and click "Edit"
+<img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/76e26caa-748b-41c6-996b-b17252340e5b" />
 
-**Example for 10,000 monthly uses:**
+3. Paste the following policy (replace your-bucket-name), if you don't remember your bucket name, you can find it written under **"Bucket ARN**:
+`
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PublicReadGetObject",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::your-bucket-name/*"
+    }
+  ]
+}
+`
+4. Click **Save Changes**
 
-* Lambda: \~\$0.01
-* DynamoDB: \~\$0.01
-* **Total: \~\$0.02/month**
+   <img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/8509355d-8906-4fc5-bbf7-ce4af05274c2" />
 
 ---
 
