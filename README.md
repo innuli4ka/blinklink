@@ -231,7 +231,7 @@ This URL will be used for both POST and GET requests. Copy this URL - we will us
 <img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/b6786bf3-019c-47bb-b162-1fa2de3bf5ba" />
 
 Scroll to the bottom of the page - you will see a static website endpoint URL. This is your frontend's public URL.
-Copy it, we will use it later:
+Copy it, this will be the link to your website
 
 <img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/9f691639-f2d7-40bb-bd29-2b034c827e9c" />
 
@@ -243,8 +243,7 @@ Copy it, we will use it later:
 <img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/76e26caa-748b-41c6-996b-b17252340e5b" />
 
 3. Paste the following policy (replace your-bucket-name), if you don't remember your bucket name, you can find it written under **"Bucket ARN**:
-`
-{
+`{
   "Version": "2012-10-17",
   "Statement": [
     {
@@ -255,8 +254,7 @@ Copy it, we will use it later:
       "Resource": "arn:aws:s3:::YOUR_BUCKET_NAME/*"
     }
   ]
-}
-`
+}`
 4. Click **Save Changes**
 
    <img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/8509355d-8906-4fc5-bbf7-ce4af05274c2" />
@@ -271,13 +269,14 @@ In order to prevent  CORS (Cross-Origin Resource Sharing) issues when accessing 
 
 2. Expand **Additional settings**
 3. Check the **Configure cross-origin resource sharing (CORS)** checkbox
-4. Under **Allow origin** paste your **bucket's URL**
+4. Under **Allow origin** paste your `*`
 5. Under **Allow header** click on **Add new value**
 6. In the new added field, type `Content-Type`
 7. Under **Allow methods** click on the field and choose the following methods: `GET` `POST`
 8. Click on **Save**
 
-<img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/8ac937de-7e21-46c8-8353-33085688f5d2" />
+<img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/68c0bdf4-1ec7-43af-974e-72a08ec2d040" />
+
 
 
 ---
