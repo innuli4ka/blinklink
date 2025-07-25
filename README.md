@@ -170,10 +170,14 @@ You’ll receive a URL like:
 https://xxxxxx.lambda-url.region.on.aws/
 ```
 
-This URL will be used for both POST and GET requests.
+This URL will be used for both POST and GET requests. Copy this URL - we will use it later in the Code.
 
 <img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/4f4ff25b-03d1-40e5-9f99-3efa7d7c6f33" />
 
+### 4.1 Connect Frontend to Lambda URL
+1. In your frontend JavaScript code, make sure to use the Lambda Function URL that you copied earlier:
+
+<img width="908" height="425" alt="image" src="https://github.com/user-attachments/assets/315f13bd-3255-4345-902b-0e31e81e3034" />
 
 ---
 
@@ -248,7 +252,7 @@ Copy it, we will use it later:
       "Effect": "Allow",
       "Principal": "*",
       "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::your-bucket-name/*"
+      "Resource": "arn:aws:s3:::YOUR_BUCKET_NAME/*"
     }
   ]
 }
@@ -256,6 +260,25 @@ Copy it, we will use it later:
 4. Click **Save Changes**
 
    <img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/8509355d-8906-4fc5-bbf7-ce4af05274c2" />
+
+
+## 🌐 Step 6: Fix CORS Issues
+
+In order to prevent  CORS (Cross-Origin Resource Sharing) issues when accessing the Lambda Function URL from the S3-hosted website, follow these steps:
+1. In your Lambda function page, click **"Configuration"** → **"Function URL"** → **Edit**
+
+<img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/71b66f20-4a9b-4cfe-87a3-861bf1274759" />
+
+2. Expand **Additional settings**
+3. Check the **Configure cross-origin resource sharing (CORS)** checkbox
+4. Under **Allow origin** paste your **bucket's URL**
+5. Under **Allow header** click on **Add new value**
+6. In the new added field, type `Content-Type`
+7. Under **Allow methods** click on the field and choose the following methods: `GET` `POST`
+8. Click on **Save**
+
+<img width="1206" height="857" alt="image" src="https://github.com/user-attachments/assets/8ac937de-7e21-46c8-8353-33085688f5d2" />
+
 
 ---
 
@@ -265,35 +288,10 @@ Copy it, we will use it later:
 
 * Ensure all files are at ZIP root level
 
-### "User is not authorized to perform: dynamodb\:PutItem"
-
-* Make sure the `AmazonDynamoDBFullAccess` policy is attached
-
-### Redirect not working
-
-* Confirm your Lambda logic is properly routing based on `event['rawPath']` or `event['path']`
 
 ### CORS Error
 
 * Add CORS headers manually in your Lambda response
-
----
-
-## 🚀 Upgrade Ideas
-
-1. Analytics for clicks
-2. Custom domains per user
-3. User authentication
-4. Expiration dates for links
-5. QR code generation
-
----
-
-## 📞 Need Help?
-
-1. Check logs in CloudWatch
-2. Ensure all services are in the same region
-3. Double-check IAM permissions
 
 ---
 
@@ -304,8 +302,7 @@ After following all steps, your URL shortener is ready:
 * ✅ Create short links
 * ✅ Automatic redirection
 * ✅ Safe storage in DynamoDB
-* ✅ Full Lambda logic with error handling
+* ✅ Full Lambda logic 
 * ✅ Logging and monitoring
-* ✅ Super low cost
 
 **That's it! You're ready to go live! 🎉**
