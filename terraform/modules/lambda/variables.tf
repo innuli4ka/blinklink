@@ -1,13 +1,3 @@
-variable "aws_region" {
-  type        = string
-  description = "The AWS region where all resources will be created"
-}
-
-variable "table_name" {
-  type        = string
-  description = "Name of the DynamoDB table"
-}
-
 variable "function_name" {
   type        = string
   description = "Name of the Lambda function"

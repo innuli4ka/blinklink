@@ -7,10 +7,10 @@ data "archive_file" "example" {
 
 resource "aws_lambda_function" "this" {
   filename         = data.archive_file.example.output_path
-  function_name    = var.function_name
-  role             = var.role_arn  
-  handler          = var.handler
   source_code_hash = data.archive_file.example.output_base64sha256
-  architectures = [var.architecture]
+  function_name    = var.function_name
+  handler          = var.handler
   runtime = var.runtime
-  }
+  architectures = [var.architecture]
+  role             = var.role_arn  
+}

@@ -10,7 +10,6 @@ module "dynamodb" {
 module "lambda" {
   source           = "./modules/lambda"
   function_name    = var.function_name
-  lambda_zip_path  = var.lambda_zip_file
   handler          = var.handler
   runtime          = var.runtime
   architecture     = var.architecture
@@ -19,6 +18,10 @@ module "lambda" {
 
 module "function_url" {
   source        = "./modules/function_url"
-  function_name = module.lambda.function_name
+  function_name = module.lambda.lambda_function_name
 }
 
+output "lambda_function_url" {
+  value       = module.function_url.function_url
+  description = "The HTTPS URL to invoke your Lambda function"
+}

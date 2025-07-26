@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BlinkLink - Fun URL Shortener</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <button id="themeToggle">🌞 / 🌙</button>
+  <div class="card">
+    <h1>BlinkLink ✂️</h1>
+        <form id="shortenForm" class="input-group" method="POST">
+        <input type="text" id="longUrl" placeholder="Paste your long URL here..." />
+        <button type="submit">Shorten It!</button>
+        </form>
+
+    <div class="short-url" id="result"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

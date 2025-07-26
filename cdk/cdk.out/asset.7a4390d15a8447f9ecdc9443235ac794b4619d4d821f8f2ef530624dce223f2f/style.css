@@ -1,0 +1,139 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Fredoka', sans-serif;
+}
+
+body {
+  background: linear-gradient(to right, #fefcea, #f1daff);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#themeToggle {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 8px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 500px;
+  position: relative;
+  min-height: 300px;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #ff5e78;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+input[type="text"] {
+  padding: 15px;
+  border: 2px dashed #ff9a9e;
+  border-radius: 12px;
+  outline: none;
+  font-size: 1rem;
+}
+
+button {
+  padding: 12px;
+  background-color: #ff7a91;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #ff5e78;
+}
+
+.short-url {
+  margin-top: 20px;
+  font-size: 1rem;
+  color: #4caf50;
+  word-break: break-all;
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #e9ecef;
+}
+
+.short-url.has-content {
+  background: #f8f9fa;
+}
+
+.copy-button {
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-left: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.copy-button:hover {
+  background: #0056b3;
+}
+
+.copy-button:active {
+  transform: scale(0.95);
+}
+
+.url-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.dark-mode {
+  background: linear-gradient(to right, #1f1c2c, #928dab);
+}
+
+.dark-mode .card {
+  background: #2b2b3c;
+  color: white;
+}
+
+.dark-mode input[type="text"] {
+  background: #3c3c4e;
+  color: white;
+  border-color: #6f6f87;
+}
+
+.dark-mode .short-url {
+  color: #90ee90;
+  background: #3c3c4e;
+  border-color: #6f6f87;
+}

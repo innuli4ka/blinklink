@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const result = document.getElementById("result");
   const themeToggle = document.getElementById("themeToggle");
 
-  const lambdaBaseUrl = "";
+  const lambdaBaseUrl = "%%LAMBDA_URL%%";
 
   themeToggle.addEventListener("click", () => {
     document.body.classList.toggle("dark-mode");

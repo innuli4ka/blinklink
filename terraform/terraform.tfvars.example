@@ -1,0 +1,7 @@
+aws_region     = "us-west-2"
+table_name     = "ShortUrls"
+function_name  = "url-shortener"
+handler        = "lambda_function.lambda_handler"
+runtime        = "python3.12"
+architecture   = "arm64"
+role_arn       = "arn:aws:iam::YOUR_ROLE_HERE"
