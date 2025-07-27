@@ -34,10 +34,7 @@ resource "null_resource" "upload_static_site" {
   depends_on = [module.cloudformation]
 
   provisioner "local-exec" {
-    command = <<EOT
-      aws s3 cp ../frontend/index.html s3://${module.cloudformation.s3_bucket_name}/index.html
-      aws s3 cp ../frontend/script.js s3://${module.cloudformation.s3_bucket_name}/script.js
-      aws s3 cp ../frontend/style.css s3://${module.cloudformation.s3_bucket_name}/style.css
-    EOT
+    command = "aws s3 cp ../frontend/index.html s3://${module.cloudformation.s3_bucket_name}/index.html && aws s3 cp ../frontend/script.js s3://${module.cloudformation.s3_bucket_name}/script.js && aws s3 cp ../frontend/style.css s3://${module.cloudformation.s3_bucket_name}/style.css"
+
   }
 }
