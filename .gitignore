@@ -20,3 +20,7 @@ terraform/terraform.tfvars
 
 # Lambda deployment zip
 url-shortener-lambda.zip
+
+#cdk attempt to use for deploying S3
+cdk/
+

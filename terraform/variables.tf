@@ -33,3 +33,16 @@ variable "role_arn" {
   type        = string
   description = "ARN of the IAM role (LabRole) to attach to the Lambda function"
 }
+
+variable "bucket_name" {
+  type        = string
+  description = "The name of the S3 bucket for static website hosting"
+}
+
+variable "frontend_files" {
+  type = list(object({
+    source       = string
+    key          = string
+    content_type = string
+  }))
+}
