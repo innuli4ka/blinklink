@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const result = document.getElementById("result");
   const themeToggle = document.getElementById("themeToggle");
 
-  const lambdaBaseUrl = "https://2u7xjjchkox4fmuzsfbcgl7hui0qyahl.lambda-url.us-west-2.on.aws/";
+  const lambdaBaseUrl = "https://2u7xjjchkox4fmuzsfbcgl7hui0qyahl.lambda-url.us-west-2.on.aws";
 
   themeToggle.addEventListener("click", () => {
     document.body.classList.toggle("dark-mode");
@@ -65,10 +65,29 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify({ url: longUrl }),
       });
 
-      const data = await response.json();
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
 
-      if (response.ok) {
-        const shortUrl = `${lambdaBaseUrl}${data.short_id}`;
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`Server error: ${response.status} - ${errorText}`);
+      }
+
+      const contentType = response.headers.get('content-type');
+      console.log('Content-Type:', contentType);
+      
+      if (!contentType?.includes('application/json')) {
+        const text = await response.text();
+        console.log('Non-JSON response:', text);
+        throw new Error('Server returned non-JSON response');
+      }
+
+      const data = await response.json();
+      console.log('Response data:', data);
+
+      if (data.short_id) {
+        const shortUrl = `${lambdaBaseUrl}/${data.short_id}`;
 
         const copyButton = document.createElement('button');
         copyButton.className = 'copy-button';
@@ -106,7 +125,9 @@ document.addEventListener("DOMContentLoaded", () => {
         result.classList.remove('has-content');
       }
     } catch (err) {
+      console.error('Fetch error:', err);
       result.innerHTML = `<span style="color: #ff5e78;">Error: ${err.message}</span>`;
+      result.classList.remove('has-content');
     }
   });
 });
