@@ -16,6 +16,9 @@ deploy-backend:
 	@echo "Getting latest Lambda URL..."
 	cd terraform && terraform output -raw lambda_function_url > ../lambda_url.txt
 
+	@echo "Getting S3 bucket name..."
+	cd terraform && terraform output -raw s3_bucket_name > ../bucket_name.txt
+
 	@echo "Generating updated script.js from template..."
 	$(MAKE) generate_script
 
@@ -23,7 +26,7 @@ deploy-backend:
 	$(MAKE) deploy-frontend
 
 	@echo "Cleaning up..."
-	@rm lambda_url.txt
+	@rm lambda_url.txt bucket_name.txt
 
 	@echo "Deploy complete"
 
@@ -32,7 +35,9 @@ generate_script:
 	@echo "✔ script.js generated with latest Lambda URL"
 
 deploy-frontend:
-	cd terraform && terraform apply -target=null_resource.upload_static_site -var-file=terraform.tfvars -auto-approve
+	@BUCKET_NAME=$$(cat bucket_name.txt); \
+	aws s3 cp frontend/index.html s3://$$BUCKET_NAME/index.html && \
+	aws s3 cp frontend/script.js s3://$$BUCKET_NAME/script.js && \
+	aws s3 cp frontend/style.css s3://$$BUCKET_NAME/style.css
 	@echo "✔ Frontend files uploaded to S3"
-
 all: deploy-backend

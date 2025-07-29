@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await response.json();
 
       if (response.ok) {
-        const shortUrl = `${lambdaBaseUrl}${data.short_id}`;
+        const shortUrl = `${lambdaBaseUrl.replace(/\/$/, '')}/${data.short_id}`;
 
         const copyButton = document.createElement('button');
         copyButton.className = 'copy-button';
