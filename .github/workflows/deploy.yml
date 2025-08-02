@@ -1,0 +1,260 @@
+name: Deploy URL Shortener
+
+on:
+  push:
+    branches: [main]
+    #will add this part in case someone else will be working on the project
+  # pull_request:
+  #   branches: [main]
+  workflow_dispatch:  # Allow manual trigger
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  # Job 1: Test the Lambda code
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install boto3
+          # Add any other dependencies your Lambda needs
+
+      - name: Run Python syntax check
+        working-directory: ./backend
+        run: |
+          python -m py_compile lambda_function.py
+          python -m py_compile handlers/create_handler.py
+          python -m py_compile handlers/redirect_handler.py
+
+      - name: Send test metrics to CloudWatch
+        if: always()
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws cloudwatch put-metric-data \
+            --region ${{ env.AWS_REGION }} \
+            --namespace "CICD/Testing" \
+            --metric-data \
+            MetricName=TestStatus,Value=${{ job.status == 'success' && '1' || '0' }},Unit=Count,Dimensions=Repository=${{ github.repository }},Developer=${{ github.actor }}
+
+  # Job 2: Terraform Plan
+  terraform-plan:
+    runs-on: ubuntu-latest
+    needs: test
+    if: needs.test.result == 'success'
+    outputs:
+      tfplanExitCode: ${{ steps.tf-plan.outputs.exitcode }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Init
+        working-directory: ./terraform
+        run: terraform init
+
+      - name: Terraform Format Check
+        working-directory: ./terraform
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        working-directory: ./terraform
+        run: terraform validate
+
+      - name: Terraform Plan
+        id: tf-plan
+        working-directory: ./terraform
+        run: |
+          export exitcode=0
+          terraform plan -detailed-exitcode -no-color -out tfplan || export exitcode=$?
+          
+          echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
+          
+          if [ $exitcode -eq 1 ]; then
+            echo Terraform Plan Failed!
+            exit 1
+          elif [ $exitcode -eq 2 ]; then
+            echo Terraform Plan has changes
+          else
+            echo No Terraform changes
+          fi
+
+      - name: Upload Terraform Plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan
+          path: terraform/tfplan
+
+  # Job 3: Deploy Infrastructure (only on main branch)
+  deploy-infrastructure:
+    runs-on: ubuntu-latest
+    needs: terraform-plan
+    if: github.ref == 'refs/heads/main' && needs.terraform-plan.outputs.tfplanExitCode == 2
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Init
+        working-directory: ./terraform
+        run: terraform init
+
+      - name: Download Terraform Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan
+          path: terraform/
+
+      - name: Start deployment timer
+        id: deploy-timer
+        run: echo "start_time=$(date +%s)" >> $GITHUB_OUTPUT
+
+      - name: Terraform Apply
+        id: terraform
+        working-directory: ./terraform
+        run: |
+          terraform apply -auto-approve tfplan
+          echo "status=success" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Calculate deployment duration
+        if: always()
+        run: |
+          end_time=$(date +%s)
+          duration=$((end_time - ${{ steps.deploy-timer.outputs.start_time }}))
+          echo "duration=$duration" >> $GITHUB_OUTPUT
+
+      - name: Send deployment metrics to CloudWatch
+        if: always()
+        run: |
+          aws cloudwatch put-metric-data \
+            --region ${{ env.AWS_REGION }} \
+            --namespace "CICD/Deployment" \
+            --metric-data \
+            MetricName=DeploymentDuration,Value=${{ steps.deploy-timer.outputs.duration }},Unit=Seconds,Dimensions=Repository=${{ github.repository }},Developer=${{ github.actor }} \
+            MetricName=DeploymentStatus,Value=${{ steps.terraform.outputs.status == 'success' && '1' || '0' }},Unit=Count,Dimensions=Repository=${{ github.repository }},Developer=${{ github.actor }}
+
+  # Job 4: Deploy Frontend (only on main branch)
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    needs: [terraform-plan, deploy-infrastructure]
+    if: always() && github.ref == 'refs/heads/main' && (needs.deploy-infrastructure.result == 'success' || needs.deploy-infrastructure.result == 'skipped')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Get S3 bucket name
+        id: get-bucket
+        run: |
+          cd terraform
+          terraform init
+          bucket_name=$(terraform output -raw s3_bucket_name)
+          echo "bucket_name=$bucket_name" >> $GITHUB_OUTPUT
+
+          - name: Update script.js with current Lambda URL (safety check)
+        run: |
+          cd terraform
+          current_url=$(terraform output -raw lambda_function_url)
+          echo "Current Lambda URL: $current_url"
+        
+          # Update script.js with current URL
+          cd ../frontend
+          if [ -f "script.template.js" ]; then
+            # If template exists, use it
+            sed "s|%%LAMBDA_URL%%|$current_url|g" script.template.js > script.js
+            echo "Generated script.js from template"
+          else
+          # If no template, update existing script.js
+            sed -i "s|https://[^/]*\.lambda-url\.[^/]*\.on\.aws/|$current_url|g" script.js
+            echo "Updated existing script.js with current URL"
+          fi
+
+      - name: Sync frontend to S3
+        run: |
+          aws s3 sync ./frontend/ s3://${{ steps.get-bucket.outputs.bucket_name }}/ \
+            --delete \
+            --exclude "*.template.js"
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
+
+      - name: Send frontend deployment metrics
+        run: |
+          aws cloudwatch put-metric-data \
+            --region ${{ env.AWS_REGION }} \
+            --namespace "CICD/Frontend" \
+            --metric-data \
+            MetricName=FrontendDeployment,Value=1,Unit=Count,Dimensions=Repository=${{ github.repository }},Developer=${{ github.actor }}
+
+  # Job 5: Notify on completion
+  notify:
+    runs-on: ubuntu-latest
+    needs: [test, deploy-infrastructure, deploy-frontend]
+    if: always()
+    
+    steps:
+      - name: Send completion metrics
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          success_count=0
+          if [ "${{ needs.test.result }}" == "success" ]; then success_count=$((success_count + 1)); fi
+          if [ "${{ needs.deploy-infrastructure.result }}" == "success" ] || [ "${{ needs.deploy-infrastructure.result }}" == "skipped" ]; then success_count=$((success_count + 1)); fi
+          if [ "${{ needs.deploy-frontend.result }}" == "success" ]; then success_count=$((success_count + 1)); fi
+          
+          aws cloudwatch put-metric-data \
+            --region ${{ env.AWS_REGION }} \
+            --namespace "CICD/Pipeline" \
+            --metric-data \
+            MetricName=PipelineSuccess,Value=$success_count,Unit=Count,Dimensions=Repository=${{ github.repository }},Developer=${{ github.actor }} \
+            MetricName=PipelineExecution,Value=1,Unit=Count,Dimensions=Repository=${{ github.repository }}
