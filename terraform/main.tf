@@ -88,8 +88,25 @@ module "cloudformation" {
   bucket_name    = var.bucket_name
 }
 
+module "cloudfront" {
+  source      = "./modules/cloudfront"
+  bucket_name = var.bucket_name
+  aws_region  = var.aws_region
+}
+
 # Add this new output:
 output "s3_bucket_name" {
   value       = module.cloudformation.s3_bucket_name  
   description = "Name of the S3 bucket"
 }
+
+output "cloudfront_url" {
+  value       = "https://${module.cloudfront.cloudfront_domain_name}"
+  description = "CloudFront URL for the website"
+}
+
+output "cloudfront_distribution_id" {
+  value       = module.cloudfront.cloudfront_distribution_id
+  description = "CloudFront Distribution ID for cache invalidation"
+}
+

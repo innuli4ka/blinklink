@@ -1,1 +1,1 @@
-role_arn = "arn:aws:iam::855198068452:role/voclabs"
+role_arn = "arn:aws:iam::521665726717:user/inna-main"
