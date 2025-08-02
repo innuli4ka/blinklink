@@ -197,12 +197,12 @@ jobs:
           bucket_name=$(terraform output -raw s3_bucket_name)
           echo "bucket_name=$bucket_name" >> $GITHUB_OUTPUT
 
-          - name: Update script.js with current Lambda URL (safety check)
+      - name: Update script.js with current Lambda URL (safety check)
         run: |
           cd terraform
           current_url=$(terraform output -raw lambda_function_url)
           echo "Current Lambda URL: $current_url"
-        
+          
           # Update script.js with current URL
           cd ../frontend
           if [ -f "script.template.js" ]; then
@@ -210,7 +210,7 @@ jobs:
             sed "s|%%LAMBDA_URL%%|$current_url|g" script.template.js > script.js
             echo "Generated script.js from template"
           else
-          # If no template, update existing script.js
+            # If no template, update existing script.js
             sed -i "s|https://[^/]*\.lambda-url\.[^/]*\.on\.aws/|$current_url|g" script.js
             echo "Updated existing script.js with current URL"
           fi
