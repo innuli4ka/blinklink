@@ -110,3 +110,9 @@ output "cloudfront_distribution_id" {
   description = "CloudFront Distribution ID for cache invalidation"
 }
 
+module "cloudwatch" {
+  source          = "./modules/cloudwatch"
+  function_name   = var.function_name
+  distribution_id = module.cloudfront.cloudfront_distribution_id
+  aws_region      = var.aws_region
+}
