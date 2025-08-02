@@ -215,10 +215,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Get S3 bucket name from terraform.tfvars
+      - name: Set S3 bucket name from secret
         id: get-bucket
         run: |
-          bucket_name=$(grep "bucket_name" terraform/terraform.tfvars | cut -d'"' -f2)
+          bucket_name="${{ secrets.S3_BUCKET_NAME }}"
           echo "bucket_name=$bucket_name" >> $GITHUB_OUTPUT
           echo "Using bucket: $bucket_name"
 
