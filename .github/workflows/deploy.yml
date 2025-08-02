@@ -208,11 +208,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.5.0
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -220,31 +215,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Get S3 bucket name
+      - name: Get S3 bucket name from terraform.tfvars
         id: get-bucket
         run: |
-          cd terraform
-          terraform init
-          bucket_name=$(terraform output -raw s3_bucket_name)
+          bucket_name=$(grep "bucket_name" terraform/terraform.tfvars | cut -d'"' -f2)
           echo "bucket_name=$bucket_name" >> $GITHUB_OUTPUT
-
-      - name: Update script.js with current Lambda URL (safety check)
-        run: |
-          cd terraform
-          current_url=$(terraform output -raw lambda_function_url)
-          echo "Current Lambda URL: $current_url"
-          
-          # Update script.js with current URL
-          cd ../frontend
-          if [ -f "script.template.js" ]; then
-            # If template exists, use it
-            sed "s|%%LAMBDA_URL%%|$current_url|g" script.template.js > script.js
-            echo "Generated script.js from template"
-          else
-            # If no template, update existing script.js
-            sed -i "s|https://[^/]*\.lambda-url\.[^/]*\.on\.aws/|$current_url|g" script.js
-            echo "Updated existing script.js with current URL"
-          fi
+          echo "Using bucket: $bucket_name"
 
       - name: Sync frontend to S3
         run: |
