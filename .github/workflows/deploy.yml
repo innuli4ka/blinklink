@@ -48,8 +48,17 @@ jobs:
           aws cloudwatch put-metric-data \
             --region ${{ env.AWS_REGION }} \
             --namespace "CICD/Testing" \
-            --metric-data \
-            MetricName=TestStatus,Value=${{ job.status == 'success' && '1' || '0' }},Unit=Count,Dimensions=[{Name=Repository,Value=${{ github.repository }}},{Name=Developer,Value=${{ github.actor }}}]
+            --metric-data '[
+              {
+                "MetricName": "TestStatus",
+                "Value": ${{ job.status == 'success' && '1' || '0' }},
+                "Unit": "Count",
+                "Dimensions": [
+                  {"Name": "Repository", "Value": "${{ github.repository }}"},
+                  {"Name": "Developer", "Value": "${{ github.actor }}"}
+                ]
+              }
+            ]'
 
   # Job 2: Terraform Plan
   terraform-plan:
@@ -168,9 +177,26 @@ jobs:
           aws cloudwatch put-metric-data \
             --region ${{ env.AWS_REGION }} \
             --namespace "CICD/Deployment" \
-            --metric-data \
-            MetricName=DeploymentDuration,Value=${{ steps.deploy-timer.outputs.duration }},Unit=Seconds,Dimensions=[{Name=Repository,Value=${{ github.repository }}},{Name=Developer,Value=${{ github.actor }}}] \
-            MetricName=DeploymentStatus,Value=${{ steps.terraform.outputs.status == 'success' && '1' || '0' }},Unit=Count,Dimensions=[{Name=Repository,Value=${{ github.repository }}},{Name=Developer,Value=${{ github.actor }}}]
+            --metric-data '[
+              {
+                "MetricName": "DeploymentDuration",
+                "Value": ${{ steps.deploy-timer.outputs.duration }},
+                "Unit": "Seconds",
+                "Dimensions": [
+                  {"Name": "Repository", "Value": "${{ github.repository }}"},
+                  {"Name": "Developer", "Value": "${{ github.actor }}"}
+                ]
+              },
+              {
+                "MetricName": "DeploymentStatus",
+                "Value": ${{ steps.terraform.outputs.status == 'success' && '1' || '0' }},
+                "Unit": "Count",
+                "Dimensions": [
+                  {"Name": "Repository", "Value": "${{ github.repository }}"},
+                  {"Name": "Developer", "Value": "${{ github.actor }}"}
+                ]
+              }
+            ]'
 
   # Job 4: Deploy Frontend (only on main branch)
   deploy-frontend:
@@ -237,8 +263,17 @@ jobs:
           aws cloudwatch put-metric-data \
             --region ${{ env.AWS_REGION }} \
             --namespace "CICD/Frontend" \
-            --metric-data \
-            MetricName=FrontendDeployment,Value=1,Unit=Count,Dimensions=[{Name=Repository,Value=${{ github.repository }}},{Name=Developer,Value=${{ github.actor }}}]
+            --metric-data '[
+              {
+                "MetricName": "FrontendDeployment",
+                "Value": 1,
+                "Unit": "Count",
+                "Dimensions": [
+                  {"Name": "Repository", "Value": "${{ github.repository }}"},
+                  {"Name": "Developer", "Value": "${{ github.actor }}"}
+                ]
+              }
+            ]'
 
   # Job 5: Notify on completion
   notify:
@@ -260,6 +295,22 @@ jobs:
           aws cloudwatch put-metric-data \
             --region ${{ env.AWS_REGION }} \
             --namespace "CICD/Pipeline" \
-            --metric-data \
-            MetricName=PipelineSuccess,Value=$success_count,Unit=Count,Dimensions=[{Name=Repository,Value=${{ github.repository }}},{Name=Developer,Value=${{ github.actor }}}] \
-            MetricName=PipelineExecution,Value=1,Unit=Count,Dimensions=[{Name=Repository,Value=${{ github.repository }}}]
+            --metric-data '[
+              {
+                "MetricName": "PipelineSuccess",
+                "Value": '$success_count',
+                "Unit": "Count",
+                "Dimensions": [
+                  {"Name": "Repository", "Value": "${{ github.repository }}"},
+                  {"Name": "Developer", "Value": "${{ github.actor }}"}
+                ]
+              },
+              {
+                "MetricName": "PipelineExecution",
+                "Value": 1,
+                "Unit": "Count",
+                "Dimensions": [
+                  {"Name": "Repository", "Value": "${{ github.repository }}"}
+                ]
+              }
+            ]'
