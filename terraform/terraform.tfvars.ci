@@ -1,0 +1,14 @@
+# terraform.tfvars.ci
+# Non-sensitive configuration for CI/CD
+# This file CAN be committed to git safely
+
+aws_region     = "us-east-1"
+table_name     = "ShortUrls"
+function_name  = "url-shortener"
+handler        = "lambda_function.lambda_handler"
+runtime        = "python3.12"
+architecture   = "arm64"
+bucket_name    = "blinklinkv1"
+
+# Note: Sensitive variables (like role_arn) come from GitHub Secrets
+# They are set via TF_VAR_role_arn environment variable in the workflow
