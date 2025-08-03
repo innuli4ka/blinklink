@@ -222,10 +222,18 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Set S3 bucket name
+      - name: Get S3 bucket name from terraform.tfvars.ci
         id: get-bucket
         run: |
-          bucket_name="${{ secrets.S3_BUCKET_NAME }}"
+          bucket_name=$(grep "bucket_name" terraform/terraform.tfvars.ci | cut -d'"' -f2 | tr -d ' ')
+          if [ -z "$bucket_name" ]; then
+            bucket_name=$(awk -F'=' '/bucket_name/ {gsub(/[ "]/, "", $2); print $2}' terraform/terraform.tfvars.ci)
+          fi
+          if [ -z "$bucket_name" ]; then
+            echo "ERROR: Could not extract bucket_name from terraform.tfvars.ci"
+            cat terraform/terraform.tfvars.ci
+            exit 1
+          fi
           echo "bucket_name=$bucket_name" >> $GITHUB_OUTPUT
           echo "Using bucket: $bucket_name"
 
