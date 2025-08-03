@@ -15,20 +15,3 @@ frontend_files = [
   "your-file-name3.css"
 ]
 
-frontend_files = [
-  {
-    key          = "index.html"
-    source       = "frontend/index.html"
-    content_type = "text/html"
-  },
-  {
-    key          = "script.js"
-    source       = "frontend/script.js"
-    content_type = "application/javascript"
-  },
-  {
-    key          = "style.css"
-    source       = "frontend/style.css"
-    content_type = "text/css"
-  }
-]

@@ -10,5 +10,23 @@ runtime        = "python3.12"
 architecture   = "arm64"
 bucket_name    = "blinklinkv1"
 
-# Note: Sensitive variables come from GitHub Secrets
+frontend_files = [
+  {
+    key          = "index.html"
+    source       = "frontend/index.html"
+    content_type = "text/html"
+  },
+  {
+    key          = "script.js"
+    source       = "frontend/script.js"
+    content_type = "application/javascript"
+  },
+  {
+    key          = "style.css"
+    source       = "frontend/style.css"
+    content_type = "text/css"
+  }
+]
+
+# Note: Sensitive variables (like role_arn) come from GitHub Secrets
 # They are set via TF_VAR_role_arn environment variable in the workflow
