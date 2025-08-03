@@ -306,3 +306,56 @@ jobs:
                 ]
               }
             ]'
+      - name: Send detailed deployment metrics
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          # Calculate detailed metrics
+          test_success=0
+          infra_success=0
+          frontend_success=0
+          total_failed=0
+          
+          if [ "${{ needs.test.result }}" == "success" ]; then test_success=1; else total_failed=$((total_failed + 1)); fi
+          if [ "${{ needs.deploy-infrastructure.result }}" == "success" ] || [ "${{ needs.deploy-infrastructure.result }}" == "skipped" ]; then infra_success=1; else total_failed=$((total_failed + 1)); fi
+          if [ "${{ needs.deploy-frontend.result }}" == "success" ]; then frontend_success=1; else total_failed=$((total_failed + 1)); fi
+          
+          # Overall deployment status
+          if [ $total_failed -eq 0 ]; then
+            deployment_success=1
+            deployment_failure=0
+          else
+            deployment_success=0
+            deployment_failure=1
+          fi
+          
+          echo "Deployment Success: $deployment_success"
+          echo "Deployment Failure: $deployment_failure"
+          echo "Total Failed Steps: $total_failed"
+          
+          # Send comprehensive metrics
+          aws cloudwatch put-metric-data \
+            --region ${{ env.AWS_REGION }} \
+            --namespace "CICD/Pipeline" \
+            --metric-data MetricName=DeploymentSuccess,Value=$deployment_success,Unit=Count,Dimensions=Name=Repository,Value=${{ github.repository }}
+          
+          aws cloudwatch put-metric-data \
+            --region ${{ env.AWS_REGION }} \
+            --namespace "CICD/Pipeline" \
+            --metric-data MetricName=DeploymentFailure,Value=$deployment_failure,Unit=Count,Dimensions=Name=Repository,Value=${{ github.repository }}
+          
+          aws cloudwatch put-metric-data \
+            --region ${{ env.AWS_REGION }} \
+            --namespace "CICD/Pipeline" \
+            --metric-data MetricName=TestSuccess,Value=$test_success,Unit=Count,Dimensions=Name=Repository,Value=${{ github.repository }}
+          
+          aws cloudwatch put-metric-data \
+            --region ${{ env.AWS_REGION }} \
+            --namespace "CICD/Pipeline" \
+            --metric-data MetricName=InfrastructureSuccess,Value=$infra_success,Unit=Count,Dimensions=Name=Repository,Value=${{ github.repository }}
+          
+          aws cloudwatch put-metric-data \
+            --region ${{ env.AWS_REGION }} \
+            --namespace "CICD/Pipeline" \
+            --metric-data MetricName=FrontendSuccess,Value=$frontend_success,Unit=Count,Dimensions=Name=Repository,Value=${{ github.repository }}
