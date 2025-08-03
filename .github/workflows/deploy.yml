@@ -306,6 +306,7 @@ jobs:
                 ]
               }
             ]'
+
       - name: Send detailed deployment metrics
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -334,28 +335,49 @@ jobs:
           echo "Deployment Failure: $deployment_failure"
           echo "Total Failed Steps: $total_failed"
           
-          # Send comprehensive metrics
+          # Send comprehensive metrics using proper JSON format
           aws cloudwatch put-metric-data \
             --region ${{ env.AWS_REGION }} \
             --namespace "CICD/Pipeline" \
-            --metric-data MetricName=DeploymentSuccess,Value=$deployment_success,Unit=Count,Dimensions=Name=Repository,Value=${{ github.repository }}
-          
-          aws cloudwatch put-metric-data \
-            --region ${{ env.AWS_REGION }} \
-            --namespace "CICD/Pipeline" \
-            --metric-data MetricName=DeploymentFailure,Value=$deployment_failure,Unit=Count,Dimensions=Name=Repository,Value=${{ github.repository }}
-          
-          aws cloudwatch put-metric-data \
-            --region ${{ env.AWS_REGION }} \
-            --namespace "CICD/Pipeline" \
-            --metric-data MetricName=TestSuccess,Value=$test_success,Unit=Count,Dimensions=Name=Repository,Value=${{ github.repository }}
-          
-          aws cloudwatch put-metric-data \
-            --region ${{ env.AWS_REGION }} \
-            --namespace "CICD/Pipeline" \
-            --metric-data MetricName=InfrastructureSuccess,Value=$infra_success,Unit=Count,Dimensions=Name=Repository,Value=${{ github.repository }}
-          
-          aws cloudwatch put-metric-data \
-            --region ${{ env.AWS_REGION }} \
-            --namespace "CICD/Pipeline" \
-            --metric-data MetricName=FrontendSuccess,Value=$frontend_success,Unit=Count,Dimensions=Name=Repository,Value=${{ github.repository }}
+            --metric-data '[
+              {
+                "MetricName": "DeploymentSuccess",
+                "Value": '$deployment_success',
+                "Unit": "Count",
+                "Dimensions": [
+                  {"Name": "Repository", "Value": "${{ github.repository }}"}
+                ]
+              },
+              {
+                "MetricName": "DeploymentFailure",
+                "Value": '$deployment_failure',
+                "Unit": "Count",
+                "Dimensions": [
+                  {"Name": "Repository", "Value": "${{ github.repository }}"}
+                ]
+              },
+              {
+                "MetricName": "TestSuccess",
+                "Value": '$test_success',
+                "Unit": "Count",
+                "Dimensions": [
+                  {"Name": "Repository", "Value": "${{ github.repository }}"}
+                ]
+              },
+              {
+                "MetricName": "InfrastructureSuccess",
+                "Value": '$infra_success',
+                "Unit": "Count",
+                "Dimensions": [
+                  {"Name": "Repository", "Value": "${{ github.repository }}"}
+                ]
+              },
+              {
+                "MetricName": "FrontendSuccess",
+                "Value": '$frontend_success',
+                "Unit": "Count",
+                "Dimensions": [
+                  {"Name": "Repository", "Value": "${{ github.repository }}"}
+                ]
+              }
+            ]'
