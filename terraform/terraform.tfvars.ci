@@ -10,5 +10,5 @@ runtime        = "python3.12"
 architecture   = "arm64"
 bucket_name    = "blinklinkv1"
 
-# Note: Sensitive variables (like role_arn) come from GitHub Secrets
+# Note: Sensitive variables come from GitHub Secrets
 # They are set via TF_VAR_role_arn environment variable in the workflow
