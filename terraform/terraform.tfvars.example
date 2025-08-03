@@ -5,3 +5,30 @@ handler        = "lambda_function.lambda_handler"
 runtime        = "python3.12"
 architecture   = "arm64"
 role_arn       = "arn:aws:iam::YOUR_ROLE_HERE"
+
+# S3 bucket for static website hosting
+bucket_name = "your-bucket-name-here"
+
+frontend_files = [
+  "your-file-name1.html",
+  "your-file-name2.js",
+  "your-file-name3.css"
+]
+
+frontend_files = [
+  {
+    key          = "index.html"
+    source       = "frontend/index.html"
+    content_type = "text/html"
+  },
+  {
+    key          = "script.js"
+    source       = "frontend/script.js"
+    content_type = "application/javascript"
+  },
+  {
+    key          = "style.css"
+    source       = "frontend/style.css"
+    content_type = "text/css"
+  }
+]
